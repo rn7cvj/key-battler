@@ -1,0 +1,17 @@
+services:
+
+    keybattler-database:
+        image: keybattler-database
+        build: ./database
+        environment:
+            POSTGRES_HOST_AUTH_METHOD: trust
+
+    keybattler-api:
+        links:
+            - keybattler-database
+       
+        image: keybattler-api
+        ports:
+            - 8002:8002
+        build: ./api
+        restart: always
