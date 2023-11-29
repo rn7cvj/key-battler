@@ -1,14 +1,24 @@
 run:
-	docker compose unpause fefuschedule-api
+	docker compose unpause api
 
 stop:
-	docker compose pause fefuschedule-api
+	docker compose pause api
 
 update:
-	cd api
-	docker compose up -d --no-deps --build fefuschedule-api
-	docker compose exec -w /api fefuschedule-api poetry run python -m alembic upgrade head
+	docker compose up -d --no-deps --build api
+	docker compose exec -w /api api python -m alembic upgrade head
+
+update-pkgs:
+	docker compose exec -w /api api pip install -r requirements.txt
+
+update-db:
+	docker compose exec -w /api api python -m alembic revision --autogenerate -m $(name)
+	docker compose exec -w /api api python -m alembic upgrade head
+	docker compose cp api:/api/migrations/versions ./api/migrations
+
+update-api:
+	docker compose cp ./api api:.
 
 start:
 	docker compose up --build -d
-	docker compose exec -w /api fefuschedule-api poetry run python -m alembic upgrade head
+	docker compose exec -w /api api python -m alembic upgrade head

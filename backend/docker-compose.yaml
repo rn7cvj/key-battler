@@ -1,17 +1,42 @@
+name: key-battler
+
 services:
 
-    keybattler-database:
-        image: keybattler-database
-        build: ./database
-        environment:
-            POSTGRES_HOST_AUTH_METHOD: trust
-
-    keybattler-api:
-        links:
-            - keybattler-database
-       
-        image: keybattler-api
-        ports:
-            - 8002:8002
-        build: ./api
+    database:
+        image: postgres:16
         restart: always
+        environment:
+            POSTGRES_PASSWORD: postgres
+        volumes:
+            - data:/var/lib/postgres
+        ports:
+            - 5432:5432
+        networks:
+            - default_network
+                 
+
+    api:
+        links:
+            - database
+        image: api
+        restart: always
+        ports:
+            - 8003:8003
+        environment:
+            DB_NAME: postgres
+            DB_PORT: 5432
+            DB_PASS: postgres
+            DB_USER: postgres
+            DB_HOST: database
+        env_file:
+            - .env
+        build: ./api
+        networks:
+            - default_network
+
+volumes:
+    data:
+        driver: local
+
+networks:
+    default_network:

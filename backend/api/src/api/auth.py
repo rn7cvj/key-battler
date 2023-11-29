@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from typing import Union
 
 from config import (ALGORITHM, AUTH_TOKEN_LIFE, REFRESH_TOKEN_LIFE, RT_SECRET,
                     SECRET_AUTH)
@@ -8,12 +9,11 @@ from fastapi import APIRouter, Depends, Header, HTTPException, Request
 from jwt import decode, encode
 from sqlalchemy import delete, insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from src.api.schemas.auth import LoginIn, LoginOut, RefreshIn
 from src.utils import time
 from werkzeug.security import check_password_hash, generate_password_hash
 
-auth_router = APIRouter(
-    prefix="/auth"
-)
+auth_router = APIRouter()
 
 
 async def type_required(types: list,  auth: str = Header(None),
@@ -69,23 +69,47 @@ def make_refresh_token(user_id: int):
     )
 
 
-@auth_router.post("/login")
-async def login_func(request: Request,
+@auth_router.post("/login", response_model=LoginOut, responses={
+    200: {
+        "description": "success",
+        "content": {
+            "application/json": {
+                "example": {
+                    "token": "string",
+                    "refresh_token": "string",
+                    "type": "moderator"}
+            }
+        }
+    },
+    400: {
+        "description": "incorrect password",
+        "content": {
+            "application/json": {
+                "example": {"detail": "wrong auth data"}
+            }
+        }
+    },
+    404: {
+        "description": "no user by that email",
+        "content": {
+            "application/json": {
+                "example": {"detail": "user not found"}
+            }
+        }
+    }
+})
+async def login_func(user: LoginIn,
                      session: AsyncSession = Depends(get_session)):
-    try:
-        data = await request.json()
 
-        nickname = data["nickname"].lstrip(' ').rstrip(' ')
-        password = data["password"].lstrip(' ').rstrip(' ')
-    except:
-        raise HTTPException(status_code=400, detail="incorrect request")
+    nickname = user.nickname.lstrip(' ').rstrip(' ')
+    password = user.password.lstrip(' ').rstrip(' ')
 
     user = (await session.execute(
         select(User.id, User.password).where(User.nickname == nickname)
     )).first()
 
     if user == None:
-        raise HTTPException(status_code=400, detail='user not found')
+        raise HTTPException(status_code=404, detail='user not found')
 
     if check_password_hash(user["password"], password):
 
@@ -94,23 +118,49 @@ async def login_func(request: Request,
         refresh_token = make_refresh_token(user["id"])
 
         return {
-            "status": "success",
-            "data": {"token": token,
-                     "refresh_token": refresh_token,
-                     "type": user["type"].name
-                     },
+            "token": token,
+            "refresh_token": refresh_token,
+            "type": user["type"].name
         }
 
     raise HTTPException(status_code=400, detail="wrong auth data")
 
 
-@auth_router.post("/refresh")
-async def refresh(request: Request,
+@auth_router.post("/refresh", response_model=LoginOut, responses={
+    200: {
+        "description": "success",
+        "content": {
+            "application/json": {
+                "example": {
+                    "token": "string",
+                    "refresh_token": "string",
+                    "type": "moderator"}
+            }
+        }
+    },
+    400: {
+        "description": "incorrect token",
+        "content": {
+            "application/json": {
+                "example": {"detail": "token is invalid"}
+            }
+        }
+    },
+    404: {
+        "description": "no user by that token",
+        "content": {
+            "application/json": {
+                "example": {"detail": "user not found"}
+            }
+        }
+    }
+})
+async def refresh(data: RefreshIn,
                   session: AsyncSession = Depends(get_session)):
-    try:
-        data = await request.json()
 
-        refresh_token_recieved = data["refresh_token"]
+    refresh_token_recieved = data.refresh_token
+
+    try:
 
         token_data = decode(refresh_token_recieved, RT_SECRET,
                             algorithms=[ALGORITHM])
@@ -148,7 +198,7 @@ async def refresh(request: Request,
     user = await session.get(User, user_id)
 
     if user == None:
-        raise HTTPException(status_code=400, detail="user not found")
+        raise HTTPException(status_code=404, detail="user not found")
 
     token = make_token(user_id)
 
@@ -165,25 +215,35 @@ async def refresh(request: Request,
 
     await session.commit()
 
-    return {
-        "status": "success",
-        "data": {"token": token,
-                 "refresh_token": refresh_token,
-                 "type": user_type
-                 },
+    return {"token": token,
+            "refresh_token": refresh_token,
+            "type": user_type
+            }
+
+
+@auth_router.post("/signup", responses={
+    200: {
+        "description": "success",
+        "content": {
+            "application/json": {
+                "example": {"detail": "successfully registered"}
+            }
+        }
+    },
+    400: {
+        "description": "nickname is already in use",
+        "content": {
+            "application/json": {
+                "example": {"detail": "nickname already picked"}
+            }
+        }
     }
-
-
-@auth_router.post("/signup")
-async def signup(request: Request,
+})
+async def signup(data: LoginIn,
                  session: AsyncSession = Depends(get_session)):
-    try:
-        data = await request.json()
 
-        nickname = data["nickname"]
-        password = data["password"]
-    except:
-        raise HTTPException(status_code=400, detail="incorrect request")
+    nickname = data.nickname.lstrip(' ').rstrip(' ')
+    password = data.password.lstrip(' ').rstrip(' ')
 
     user = (await session.execute(select(User).where(User.nickname == nickname))).first()
 

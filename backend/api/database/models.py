@@ -27,3 +27,5 @@ class RefreshTokenStorage(base):
 
     refresh_token = Column(TEXT)
     expired = Column(TIMESTAMP)
+    
+    test = Column(TEXT)
