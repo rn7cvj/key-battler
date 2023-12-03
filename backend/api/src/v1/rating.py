@@ -1,8 +1,11 @@
+from datetime import datetime
+
 from database.database import get_session
 from database.models import Result, Text, Tier, User
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import delete, desc, insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from src.utils import time
 from src.v1.auth import login_required
 from src.v1.schemas.rating import RatingIn
 
@@ -23,7 +26,8 @@ async def rating_add_result(result: RatingIn,
         "text_id": result.text_id,
         "user_id": user.id,
         "speed": result.speed,
-        "correct_rate": result.correct_rate
+        "correct_rate": result.correct_rate,
+        "time": time()
     }
 
     await session.execute(insert(Result).values(result_ins))
@@ -39,7 +43,7 @@ async def rating_add_result(text_id: int = None,
                             session: AsyncSession = Depends(get_session)):
 
     result = []
-    
+
     try:
         if text_id == None and tier == None:
 
@@ -51,11 +55,11 @@ async def rating_add_result(text_id: int = None,
 
                 result.append([x._mapping for x in (await session.execute(
                     select(Result.id.label("result_id"),
-                        User.nickname,
-                        Text.id.label("text_id"),
-                        Result.speed,
-                        Result.correct_rate,
-                        (Tier.speed_ratio*Result.speed +
+                           User.nickname,
+                           Text.id.label("text_id"),
+                           Result.speed,
+                           Result.correct_rate,
+                           (Tier.speed_ratio*Result.speed +
                             Tier.correct_rate_ratio*Result.correct_rate).label("score"))
                     .where(Result.text_id == Text.id)
                     .where(Text.tier == Tier.id)
@@ -73,10 +77,10 @@ async def rating_add_result(text_id: int = None,
 
                 result.append([x._mapping for x in (await session.execute(
                     select(Result.id.label("result_id"),
-                        User.nickname,
-                        Result.speed,
-                        Result.correct_rate,
-                        (Tier.speed_ratio*Result.speed +
+                           User.nickname,
+                           Result.speed,
+                           Result.correct_rate,
+                           (Tier.speed_ratio*Result.speed +
                             Tier.correct_rate_ratio*Result.correct_rate).label("score"))
                     .where(Result.text_id == Text.id)
                     .where(Text.tier == Tier.id)
@@ -88,9 +92,9 @@ async def rating_add_result(text_id: int = None,
         elif text_id == None and tier != None:
 
             users = (await session.execute(select(Result.user_id)
-                                        .where(Result.text_id == Text.id)
-                                        .where(Text.tier == Tier.id)
-                                        .where(Tier.id == tier))).unique().all()
+                                           .where(Result.text_id == Text.id)
+                                           .where(Text.tier == Tier.id)
+                                           .where(Tier.id == tier))).unique().all()
 
             for user_raw in users:
 
@@ -98,11 +102,11 @@ async def rating_add_result(text_id: int = None,
 
                 result.append([x._mapping for x in (await session.execute(
                     select(Result.id.label("result_id"),
-                        User.nickname,
-                        Text.id.label("text_id"),
-                        Result.speed,
-                        Result.correct_rate,
-                        (Tier.speed_ratio*Result.speed +
+                           User.nickname,
+                           Text.id.label("text_id"),
+                           Result.speed,
+                           Result.correct_rate,
+                           (Tier.speed_ratio*Result.speed +
                             Tier.correct_rate_ratio*Result.correct_rate).label("score"))
                     .where(Result.text_id == Text.id)
                     .where(Text.tier == Tier.id)
@@ -113,6 +117,6 @@ async def rating_add_result(text_id: int = None,
 
         else:
             raise HTTPException(status_code=400, detail="wrong parameters")
-        
+
     except:
         return result

@@ -57,3 +57,4 @@ class Result(base):
 
     speed = Column(Integer)
     correct_rate = Column(Integer)
+    time = Column(TIMESTAMP)

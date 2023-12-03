@@ -1,3 +1,9 @@
+ifeq ($(OS),Windows_NT)
+	SLEEP := timeout
+else
+	SLEEP := sleep
+endif
+
 run:
 	docker compose unpause api
 
@@ -22,3 +28,6 @@ update-api:
 
 start:
 	docker compose up --build -d
+	$(SLEEP) 2
+
+	docker compose exec -w /api api python -m alembic upgrade head
