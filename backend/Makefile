@@ -17,11 +17,14 @@ update:
 update-pkgs:
 	docker compose exec -w /api api pip install -r requirements.txt
 
-update-db:
+update-db-full:
 	docker compose cp ./api/database api:/api
 	docker compose exec -w /api api python -m alembic revision --autogenerate -m "$(name)"
 	docker compose exec -w /api api python -m alembic upgrade head
 	docker compose cp api:/api/migrations/versions ./api/migrations
+
+update-db:
+	docker compose exec -w /api api python -m alembic upgrade head
 
 update-api:
 	docker compose cp ./api api:.
