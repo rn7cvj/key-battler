@@ -4,11 +4,15 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.v1.auth import auth_router
+from src.v1.text import text_router
+from src.v1.rating import rating_router
 from src.v1.schemas.api import ServerStatus
 
 router = APIRouter()
 
 router.include_router(auth_router, prefix="/auth", tags=["auth"])
+router.include_router(text_router, prefix="/text", tags=["text"])
+router.include_router(rating_router, prefix="/rating", tags=["rating"])
 
 
 @router.get("/serverStatus", response_model=ServerStatus, responses={

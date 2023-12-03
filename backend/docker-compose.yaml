@@ -7,13 +7,11 @@ services:
         restart: always
         environment:
             POSTGRES_PASSWORD: postgres
-        volumes:
-            - data:/var/lib/postgres
         ports:
-            - 5432:5432
-        networks:
-            - default_network
-                 
+            - 5440:5432
+        volumes:
+            - ./dumps/dump1.sql:/docker-entrypoint-initdb.d/dump1.sql
+            - data:/var/lib/postgres
 
     api:
         links:
@@ -31,12 +29,8 @@ services:
         env_file:
             - .env
         build: ./api
-        networks:
-            - default_network
+        command: python -m uvicorn src.app:app --port 8003 --host 0.0.0.0 --reload
 
 volumes:
     data:
         driver: local
-
-networks:
-    default_network:

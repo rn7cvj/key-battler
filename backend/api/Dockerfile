@@ -5,5 +5,3 @@ WORKDIR /api
 COPY . /api
 
 RUN pip install -r requirements.txt
-
-CMD ["python", "-m", "uvicorn", "src.app:app", "--port", "8003", "--host", "0.0.0.0", "--reload"]
