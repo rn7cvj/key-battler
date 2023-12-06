@@ -35,7 +35,7 @@ export default defineComponent(
             value.json().then((data) => {
               console.log(data);
 
-              this.leaderList = data.map((e) => { return  {"name" : e["nickname"] ,  score : e["score"]}});
+              this.leaderList = data.map((e: { [x: string]: any; }) => { return  {"name" : e["nickname"] ,  score : e["score"]}});
             })
             this.isLoading = false;
           })
