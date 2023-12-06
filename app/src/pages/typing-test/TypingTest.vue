@@ -22,7 +22,7 @@ export default defineComponent(
             return;
           }
           this.typedText += this.untypedText.charAt(0);
-          this.untypedText = this.untypedText.substring(1 , this.untypedText.length - 1);
+          this.untypedText = this.untypedText.substring(1 );
         }
       }
     }
