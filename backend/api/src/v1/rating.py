@@ -39,7 +39,7 @@ async def rating_add_result(result: RatingIn,
 @rating_router.get("/view")
 async def rating_add_result(text_id: int = None,
                             tier: int = None,
-                            user_in=Depends(login_required),
+                            # user_in=Depends(login_required),
                             session: AsyncSession = Depends(get_session)):
 
     result = []
@@ -120,3 +120,5 @@ async def rating_add_result(text_id: int = None,
 
     except:
         return result
+    
+    return result
