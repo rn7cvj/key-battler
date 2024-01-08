@@ -1,10 +1,12 @@
 <script  lang="ts">
 
 import {defineComponent} from "vue";
+import Timer from "./components/Timer.vue";
 
 
 export default defineComponent(
     {
+      components: {Timer},
 
       data(){
         window.addEventListener('keydown' , (ev : KeyboardEvent ) => {
@@ -34,6 +36,8 @@ export default defineComponent(
 <template>
     <div>
       <h1 class="p-5">Typing test</h1>
+
+      <Timer/>
 
       <h4>
         <span class="text-primary">

@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router';
+import {createRouter, createWebHistory} from 'vue-router';
 import HomePage from "./pages/home/HomePage.vue";
 import LeaderBoard from "./pages/leader-board/LeaderBoard.vue";
 import TypingTest from "./pages/typing-test/TypingTest.vue";
@@ -15,7 +15,8 @@ export default createRouter({
         {
             path: "/",
             component: LoginPage,
-        },{
+        },
+        {
             path: "/signup",
             component: SignUp,
         },
