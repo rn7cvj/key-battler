@@ -10,24 +10,32 @@ import Slider from "primevue/slider";
 let nickName : Ref<string> = ref("")
 
 
-const  speedRangeOp = ref();
-const speedRange : Ref<number[]> = ref([0 , 300]);
-const  openSpeedRangeDialog = (event) => {
+const speedRangeOp = ref();
+const speedRangeMinMax : number[] = [0 , 300];
+const speedRange : Ref<number[]> = ref(speedRangeMinMax);
+const  openSpeedRangeDialog = (event : Event) => {
   speedRangeOp.value.toggle(event);
 }
 
-const  correctionRangeOp = ref();
-let correctionRange : Ref<number[]> = ref([0 , 100]);
+const correctionRangeOp = ref();
+const correctionRangeMinMax : number[] = [0 , 100];
+const correctionRange : Ref<number[]> = ref(correctionRangeMinMax);
 
-const  openCorrectionRangeDialog = (event) => {
+const  openCorrectionRangeDialog = (event:  Event) => {
   correctionRangeOp.value.toggle(event);
 }
 
-const  scoreRangeOp = ref();
-let scoreRange : Ref<number[]> = ref([0 , 1000]);
-const  openScoreRangeDialog = (event) => {
+const scoreRangeOp = ref();
+const scoreRangeMinMax : number[]  = [0 , 1000];
+const scoreRange : Ref<number[]> = ref(scoreRangeMinMax);
+const  openScoreRangeDialog = (event:  Event) => {
+  console.log(event)
   scoreRangeOp.value.toggle(event);
 }
+
+const props = defineProps({
+  isLoading : Ref<boolean> ,
+});
 
 
 </script>
@@ -55,7 +63,7 @@ const  openScoreRangeDialog = (event) => {
           <div>{{speedRange[0]}} :  {{speedRange[1]}} </div>
         </div>
 
-        <Slider v-model="speedRange" range />
+        <Slider v-model="speedRange" range :min="speedRangeMinMax[0]" :max="speedRangeMinMax[1]" />
       </div>
     </OverlayPanel>
 
@@ -72,13 +80,14 @@ const  openScoreRangeDialog = (event) => {
           <div>{{correctionRange[0]}} :  {{correctionRange[1]}} </div>
         </div>
 
-        <Slider v-model="correctionRange" range />
+        <Slider v-model="correctionRange" range :min="correctionRangeMinMax[0]" :max="correctionRangeMinMax[1]" />
       </div>
     </OverlayPanel>
 
     <Button
         label="Score Range"
         severity="secondary"
+
         @click="openScoreRangeDialog"
     />
 
@@ -89,7 +98,7 @@ const  openScoreRangeDialog = (event) => {
           <div>{{scoreRange[0]}} :  {{scoreRange[1]}} </div>
         </div>
 
-        <Slider v-model="scoreRange" range />
+        <Slider v-model="scoreRange" range :min="scoreRangeMinMax[0]" :max="scoreRangeMinMax[1]" />
       </div>
     </OverlayPanel>
 
