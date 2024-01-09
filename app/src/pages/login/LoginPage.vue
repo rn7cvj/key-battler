@@ -3,18 +3,25 @@
 
 // import {defineComponent} from "vue";
 import {Ref, ref} from 'vue';
+
+import Toast from "primevue/toast";
 import Button from "primevue/button";
 import Password from "primevue/password";
 import InputText from "primevue/inputtext";
-import router from "../../router.ts";
 
+import {useToast} from "primevue/usetoast";
+
+import router from "../../router.ts";
 
 let userName : Ref<string>= ref("");
 let password : Ref<string> = ref("");
 
 let isLoading : Ref<boolean> = ref(false);
 
-const login = () => {
+const toast = useToast();
+
+
+const login = async () => {
   isLoading.value = true;
   console.log(`Login with\nUserName: ${userName.value} Password:${password.value}`)
 
@@ -25,22 +32,68 @@ const login = () => {
     password: password.value
   };
 
-  fetch(url, {
+  let response : Response | null = await fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify(data)
-  })
-      .then(response => response.json())
-      .then(data => {
-        isLoading.value = false;
-        console.log(data);
-      })
-      .catch(error => {
-        isLoading.value = false;
-        console.error(error);
+  }).catch(
+      (error) => {
+
+        console.log(error);
+
+        toast.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Server is temporarily unavailable',
+          group: 'bl',
+          life: 900
+        });
+
+        return null;
+
       });
+
+  isLoading.value = false;
+
+  if (response == null) return;
+
+  if (response.status == 404) {
+    toast.add({
+      severity: 'warn',
+      summary: '',
+      detail: 'The username or password you entered is incorrect',
+      group: 'bl',
+      life: 900
+    })
+  }
+
+
+
+  // fetch(url, {
+  //   method: 'POST',
+  //   headers: {
+  //     'Content-Type': 'application/json'
+  //   },
+  //   body: JSON.stringify(data)
+  // })
+  //     .then(response => {
+  //       isLoading.value = false;
+  //       let data  = response.json();
+  //
+  //       if (!response.ok){
+  //         toast.add({ severity: 'error', summary: 'Error', detail: 'Server is temporarily unavailable', group: 'bl',  life: 900 })
+  //         return;
+  //       }
+  //
+  //       console.log(data);
+  //     })
+  //     .catch(error => {
+  //       isLoading.value = false;
+  //       toast.add({ severity: 'error', summary: 'Error', detail: 'Server is temporarily unavailable', group: 'bl' ,  life: 900 })
+  //       console.error(error);
+  //     });
 
 
 }
@@ -54,9 +107,9 @@ const  openSignUp = () => {
 
 <template>
 
-    <div class="main-container">
+    <div class="main-container card">
 
-
+      <Toast  position="bottom-left" group="bl" />
       <h1>Login to keybattler</h1>
 
       <span class="p-float-label" style="margin-top: 50px" >

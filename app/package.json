@@ -11,9 +11,11 @@
   "dependencies": {
     "bootstrap": "^5.3.2",
     "bootstrap-vue": "^2.23.1",
+    "electorn": "^0.0.1-security",
     "mobx-vue-lite": "^0.4.1",
     "primevue": "^3.46.0",
     "vue": "^3.4.5",
+    "vue-cli-plugin-electron-builder": "^2.1.1",
     "vue-router": "^4.2.5",
     "vue-timer-hook": "^1.0.84"
   },
