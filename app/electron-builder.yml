@@ -1,0 +1,3 @@
+target:
+  - target: nsis
+    arch: x64

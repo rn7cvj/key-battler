@@ -1,73 +1,188 @@
-<script  lang="ts">
+<script setup lang="ts">
 
-import {defineComponent} from "vue";
+import {onMounted, Ref, ref} from 'vue';
+
+import router from "../../router.ts";
+
+import Button  from "primevue/button";
+import Column from "primevue/column";
+import DataTable from "primevue/datatable";
+import Skeleton from "primevue/skeleton";
+import Toast from "primevue/toast";
+
+import {useToast} from "primevue/usetoast";
+import SearchBar from "./components/SearchBar.vue";
 
 
-export default defineComponent(
-    {
-      data(){
-        this.fetchLeaderBoard()
-        return {
-          isLoading: true ,
-          leaderList : [
-          {
-            "name" : "kirden04" ,
-            "score" : "234",
-          },
-          {
-            "name" : "rn7cvj" ,
-            "score" : "224",
-          },
-        ]
+const back = () => {router.back()};
+
+
+
+const toast = useToast();
+
+let isLoading : Ref<boolean> = ref(true);
+
+
+
+onMounted(() => fetchLeaderBoard() );
+
+const fetchLeaderBoard = async  () => {
+
+  isLoading.value = true;
+
+  const url = "https://keybattler.poslam.ru/api/v1/rating/view";
+
+  let response : Response | null = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+  }).catch(
+      (error) => {
+
+        console.log(error);
+
+        toast.add(
+            {
+              severity: 'error',
+              summary: 'Error',
+              detail: 'Server is temporarily unavailable, can`t load leader board',
+              group: 'bl',
+              life: 1500
+            }
+        )
+
+        return null;
       }
-      } ,
-      methods: {
-        fetchLeaderBoard(){
-          this.isLoading = true;
+  )
 
-          let result =  fetch(
-              "http://poslam.rn7cvj-dev.ru/api/v1/rating/view", {
-                method: "GET",
-              }
-          );
+  if (response == null) return;
 
-          result.then((value) =>{
-            value.json().then((data) => {
-              console.log(data);
-
-              this.leaderList = data.map((e: { [x: string]: any; }) => { return  {"name" : e["nickname"] ,  score : e["score"]}});
-            })
-            this.isLoading = false;
-          })
-
-
-
-          // this.isLoading = false;
+  if (!response.ok)
+  {
+    toast.add(
+        {
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Server is temporarily unavailable, can`t load leader board',
+          group: 'bl',
+          life: 1500
         }
-      }
-    }
-)
+    )
+    return ;
+  }
+
+  let data = await  response.json();
+
+  leaderList.value = data;
+
+  if (leaderList.value.length == 0){
+    toast.add(
+        {
+          severity: 'info',
+          summary: 'Info',
+          detail: 'Leader board is empty',
+          group: 'bl',
+          // life: 3000
+        }
+    )
+
+  }
+
+  isLoading.value = false;
+}
+
+const leaderList = ref([]);
 
 </script>
 
 <template>
-  <div style="width: 100vh">
+
+  <Toast  position="bottom-left" group="bl" />
+
+  <div class="main-container leader-board-container">
+
+    <div style="width: 100%; height : 80px; align-items: center; display: flex; ">
+      <Button type="button" label="Back" icon="pi pi-arrow-left"  @click="back" />
+    </div>
 
     <h1>Leader Board</h1>
 
 
-    <div class="spinner-border" role="status" v-if="isLoading">
-      <span class="visually-hidden">Loading...</span>
+    <SearchBar/>
+
+
+    <div class="card" >
+
+      <DataTable :value="[0 , 1 ,2 ,3]" tableStyle="width: 50vw;"  size="large" v-if="isLoading || leaderList.length == 0">
+        <Column field="nickname" header="Nickname" style="width: 40%">
+          <template #body>
+            <Skeleton></Skeleton>
+          </template>
+        </Column>
+        <Column field="speed" :sortable="true" header="Speed" style="width: 20%">
+          <template #body>
+            <Skeleton></Skeleton>
+          </template>
+        </Column>
+        <Column field="correct_rate" :sortable="true"  header="Correction" style="width: 20%">
+          <template #body>
+            <Skeleton></Skeleton>
+          </template>
+        </Column>
+        <Column field="score" :sortable="true" header="Score" style="width: 20%">
+          <template #body>
+            <Skeleton></Skeleton>
+          </template>
+        </Column>
+      </DataTable>
+
+      <DataTable :value="leaderList" tableStyle="width: 50vw;"  size="large" v-if="!isLoading && leaderList.length > 0"  >
+        <Column field="nickname" header="Nickname"></Column>
+        <Column field="speed" :sortable="true"  header="Speed"></Column>
+        <Column field="correct_rate" :sortable="true" header="Correction"></Column>
+        <Column field="score" :sortable="true" header="Score"></Column>
+      </DataTable>
+
+
     </div>
 
+      <Button type="button"
+              style="margin-top: 40px "
+              label="Refresh"
+              :icon = "isLoading ? 'pi pi-spinner pi-spin' : 'pi pi-refresh' "
+              :disabled=isLoading
+              @click="fetchLeaderBoard"/>
 
-    <ul v-if="!isLoading" class="list-group">
-      <li v-for="leader in leaderList" class="list-group-item">{{leader.name}} :  {{leader.score}}</li>
-
-    </ul>
   </div>
+
 </template>
 
 <style scoped>
+
+.leader-board-container{
+  justify-content: start;
+  align-items: center;
+}
+
+.shimmer{
+
+  display: flex;
+  height : 220px;
+  justify-content: space-between;
+  flex-direction: column;
+
+}
+
+.card{
+  background: var(--surface-card);
+
+  border-radius: 10px;
+
+  min-height: 300px;
+
+  padding: 40px;
+}
+
 
 </style>

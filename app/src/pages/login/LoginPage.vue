@@ -20,7 +20,6 @@ let isLoading : Ref<boolean> = ref(false);
 
 const toast = useToast();
 
-
 const login = async () => {
   isLoading.value = true;
   console.log(`Login with\nUserName: ${userName.value} Password:${password.value}`)
@@ -48,7 +47,7 @@ const login = async () => {
           summary: 'Error',
           detail: 'Server is temporarily unavailable',
           group: 'bl',
-          life: 900
+          life: 1500
         });
 
         return null;
@@ -65,37 +64,18 @@ const login = async () => {
       summary: '',
       detail: 'The username or password you entered is incorrect',
       group: 'bl',
-      life: 900
+      life: 1500
     })
+    return;
   }
 
+  let result = await response.json();
 
+  localStorage.setItem("token" , result["token"])
 
-  // fetch(url, {
-  //   method: 'POST',
-  //   headers: {
-  //     'Content-Type': 'application/json'
-  //   },
-  //   body: JSON.stringify(data)
-  // })
-  //     .then(response => {
-  //       isLoading.value = false;
-  //       let data  = response.json();
-  //
-  //       if (!response.ok){
-  //         toast.add({ severity: 'error', summary: 'Error', detail: 'Server is temporarily unavailable', group: 'bl',  life: 900 })
-  //         return;
-  //       }
-  //
-  //       console.log(data);
-  //     })
-  //     .catch(error => {
-  //       isLoading.value = false;
-  //       toast.add({ severity: 'error', summary: 'Error', detail: 'Server is temporarily unavailable', group: 'bl' ,  life: 900 })
-  //       console.error(error);
-  //     });
+  console.log(`New token: ${result["token"]}`)
 
-
+   router.replace("/home")
 }
 
 const  openSignUp = () => {
@@ -107,18 +87,27 @@ const  openSignUp = () => {
 
 <template>
 
+    <Toast  position="bottom-left" group="bl" />
+
     <div class="main-container card">
 
-      <Toast  position="bottom-left" group="bl" />
+
       <h1>Login to keybattler</h1>
 
       <span class="p-float-label" style="margin-top: 50px" >
-        <InputText id="username" v-model="userName"  style="width: 550px" />
+        <InputText id="username"
+                   v-model="userName"
+                   :disabled="isLoading"
+                   style="width: 550px" />
         <label for="username">Username</label>
       </span>
 
       <span class="p-float-label" style="margin-top: 50px">
-        <Password v-model="password" inputId="password" :feedback="false"  :inputStyle="{width : '550px'}"  />
+        <Password v-model="password"
+                  inputId="password"
+                  :feedback="false"
+                  :disabled="isLoading"
+                  :inputStyle="{width : '550px'}"  />
         <label for="password">Password</label>
       </span>
 
@@ -126,7 +115,7 @@ const  openSignUp = () => {
 
         <Button type="button" label="Login" :loading="isLoading" @click="login" style="width : 250px; margin-right : 25px;" />
 
-        <Button label="Sign Up" link href="/signup" @click="openSignUp"  style="width : 250px; margin-left : 25px;" />
+        <Button label="Sign Up" link @click="openSignUp"  style="width : 250px; margin-left : 25px;" />
 
 
       </div>
@@ -137,20 +126,6 @@ const  openSignUp = () => {
 
 <style scoped>
 
-.main-container {
-
-  height : 90vh;
-  width : 100%;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-
-  flex-direction: column;
-
-
-}
 
 
 </style>

@@ -6,8 +6,11 @@ import LoginPage from "./pages/login/LoginPage.vue";
 import SignUp from "./pages/sign-up/SignUp.vue";
 
 export default createRouter({
+
+    // history: import.meta.env.IS_ELECTRON ? createWebHashHistory() : createWebHistory(),
     history: createWebHistory(),
     routes: [
+
         {
             path: '/home',
             component: HomePage,

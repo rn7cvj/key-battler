@@ -45,7 +45,7 @@ const login = async () => {
           summary: 'Error',
           detail: 'Server is temporarily unavailable',
           group: 'bl',
-          life: 900
+          life: 1500
         });
 
         return null;
@@ -65,7 +65,7 @@ const login = async () => {
       summary: 'UserName',
       detail: 'Username is already taken',
       group: 'bl',
-      life: 900
+      life: 1500
     });
 
     return;
@@ -82,19 +82,25 @@ const  openLogin = () => {
 
 <template>
 
+  <Toast  position="bottom-left" group="bl" />
+
   <div class="main-container">
 
-    <Toast  position="bottom-left" group="bl" />
+
     <h1>Sign up in keybattler</h1>
 
     <span class="p-float-label" style="margin-top: 50px" >
-        <InputText id="username" v-model="userName"  style="width: 550px" />
+        <InputText id="username"
+                   v-model="userName"
+                   :disabled="isLoading"
+                   style="width: 550px" />
         <label for="username">Username</label>
       </span>
 
     <span class="p-float-label" style="margin-top: 50px">
         <Password v-model="password"
                   inputId="password"
+                  :disabled="isLoading"
                   :feedback="true"
                   :inputStyle="{width : '550px'}"/>
         <label for="password">Password</label>
@@ -104,7 +110,7 @@ const  openLogin = () => {
 
       <Button type="button" label="Sign Up" :loading="isLoading" @click="login" style="width : 250px; margin-right : 25px;" />
 
-      <Button label="Login" link href="/signup" @click="openLogin"  style="width : 250px; margin-left : 25px;" />
+      <Button label="Login" link  @click="openLogin"  style="width : 250px; margin-left : 25px;" />
 
 
     </div>
@@ -115,20 +121,6 @@ const  openLogin = () => {
 
 <style scoped>
 
-.main-container {
-
-  height : 90vh;
-  width : 100%;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-
-  flex-direction: column;
-
-
-}
 
 
 </style>
