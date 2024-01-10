@@ -118,7 +118,7 @@ async def rating_add_result(text_id: int = None,
         else:
             raise HTTPException(status_code=400, detail="wrong parameters")
 
-    except:
-        return result
+    except Exception as e:
+        return str(e)
     
     return result
