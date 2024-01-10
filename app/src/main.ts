@@ -1,11 +1,9 @@
-import { createApp } from 'vue';
-
+import { createApp  } from 'vue';
 
 import './style.css';
 
 import App from './App.vue'
 import router from "./router";
-
 
 import PrimeVue from 'primevue/config';
 import ToastService from 'primevue/toastservice';
@@ -17,11 +15,9 @@ import "primevue/resources/themes/lara-dark-green/theme.css";
 
 const app  = createApp(App)
 
-app.config.globalProperties.token = ""
-
 app.use(router)
 
-app.use(PrimeVue )
+app.use(PrimeVue)
 app.use(ToastService)
 app.use(ConfirmationService);
 

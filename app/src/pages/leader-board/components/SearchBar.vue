@@ -18,8 +18,7 @@ const  openSpeedRangeDialog = (event : Event) => {
 }
 
 const correctionRangeOp = ref();
-const correctionRangeMinMax : number[] = [0 , 100];
-const correctionRange : Ref<number[]> = ref(correctionRangeMinMax);
+
 
 const  openCorrectionRangeDialog = (event:  Event) => {
   correctionRangeOp.value.toggle(event);
@@ -34,8 +33,9 @@ const  openScoreRangeDialog = (event:  Event) => {
 }
 
 const props = defineProps({
-  isLoading : Ref<boolean> ,
-});
+  isLoading : Boolean ,
+
+})
 
 
 </script>
@@ -44,20 +44,22 @@ const props = defineProps({
 
   <div class="search-bar">
 
-    <span class="p-input-icon-left p-float-label"  style="width: 35%; ">
+    <span class="p-input-icon-left p-float-label"  style="width: 400px; margin: 20px">
       <i class="pi pi-search" />
-      <InputText :v-model="nickName" id="nickname" style="width: 100% " />
+      <InputText :v-model="nickName" id="nickname" style="width: 100% "  :disabled="props.isLoading"/>
       <label for="nickname">Nickname</label>
     </span>
 
     <Button
       label="Speed Range"
       severity="secondary"
+      style="margin: 20px"
+      :disabled="props.isLoading"
       @click="openSpeedRangeDialog"
     />
 
     <OverlayPanel ref="speedRangeOp">
-      <div style="width: 250px; text-align: center">
+      <div style="width: 300px; text-align: center">
         <div class="range-dialog-header" style=" ">
           <div  >Current speed range </div>
           <div>{{speedRange[0]}} :  {{speedRange[1]}} </div>
@@ -70,11 +72,13 @@ const props = defineProps({
     <Button
         label="Correction Range"
         severity="secondary"
+        style="margin: 20px"
+        :disabled="props.isLoading"
         @click="openCorrectionRangeDialog"
     />
 
     <OverlayPanel ref="correctionRangeOp">
-      <div style="width: 250px; text-align: center">
+      <div style="width: 300px; text-align: center">
         <div class="range-dialog-header" style=" ">
           <div  >Current correction range </div>
           <div>{{correctionRange[0]}} :  {{correctionRange[1]}} </div>
@@ -87,12 +91,13 @@ const props = defineProps({
     <Button
         label="Score Range"
         severity="secondary"
-
+        style="margin: 20px"
+        :disabled="props.isLoading"
         @click="openScoreRangeDialog"
     />
 
     <OverlayPanel ref="scoreRangeOp">
-      <div style="width: 250px; text-align: center">
+      <div style="width: 300px; text-align: center">
         <div class="range-dialog-header" style=" ">
           <div  >Current correction range </div>
           <div>{{scoreRange[0]}} :  {{scoreRange[1]}} </div>
@@ -111,7 +116,6 @@ const props = defineProps({
 
 .search-bar{
 
-  width: 50vw;
 
   padding-top: 20px;
   padding-bottom: 40px;
@@ -123,6 +127,9 @@ const props = defineProps({
   justify-content: space-evenly;
   align-items: center;
 
+
+  flex-wrap: wrap;
+
 }
 
 .range-dialog-header {
@@ -132,6 +139,7 @@ const props = defineProps({
 
   flex-direction: row;
   justify-content: space-between;
+
 }
 
 </style>

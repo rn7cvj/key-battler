@@ -12,17 +12,14 @@ import Toast from "primevue/toast";
 
 import {useToast} from "primevue/usetoast";
 import SearchBar from "./components/SearchBar.vue";
+import { ILeader } from "../../interface/leader.ts";
 
 
 const back = () => {router.back()};
 
-
-
 const toast = useToast();
 
 let isLoading : Ref<boolean> = ref(true);
-
-
 
 onMounted(() => fetchLeaderBoard() );
 
@@ -74,7 +71,16 @@ const fetchLeaderBoard = async  () => {
 
   let data = await  response.json();
 
-  leaderList.value = data;
+  leaderList.value = data.map((d :any) =>{
+    let  leader : ILeader = {
+      resultId : d['result_id'] ,
+      nickName : d['nickname'],
+      speed : d['speed'] ,
+      correctRate : d['correct_rate'],
+      score : d['score'],
+    }
+    return leader;
+  });
 
   if (leaderList.value.length == 0){
     toast.add(
@@ -92,7 +98,29 @@ const fetchLeaderBoard = async  () => {
   isLoading.value = false;
 }
 
-const leaderList = ref([]);
+const leaderList : Ref<ILeader[]> = ref([]);
+
+const speedRangeMinMax : number[] = [0 , 400];
+const speedRange : Ref<number[]> = ref(speedRangeMinMax);
+
+const correctionRangeMinMax : number[] = [0 , 100];
+const correctionRange : Ref<number[]> = ref(correctionRangeMinMax);
+
+const scoreRangeMinMax : number[]  = [0 , 1000];
+const scoreRange : Ref<number[]> = ref(scoreRangeMinMax);
+
+const sordedLeaderList = (speedRanger : number[] , correctionRange : number[] , scoreRange : number[]) : ILeader[] => {
+
+  let sortedLeader  : ILeader[] = leaderList.value;
+
+  sortedLeader = sortedLeader.filter((l : ILeader) =>  speedRanger[0] <= l.speed && l.speed <= speedRanger[1]);
+  sortedLeader = sortedLeader.filter((l : ILeader) =>  correctionRange[0] <= l.correctRate && l.correctRate <= correctionRange[1]);
+  sortedLeader = sortedLeader.filter((l : ILeader) =>  scoreRange[0] <= l.score && l.score <= scoreRange[1]);
+
+
+
+  return  sortedLeader
+}
 
 </script>
 
@@ -103,13 +131,19 @@ const leaderList = ref([]);
   <div class="main-container leader-board-container">
 
     <div style="width: 100%; height : 80px; align-items: center; display: flex; ">
-      <Button type="button" label="Back" icon="pi pi-arrow-left"  @click="back" />
+      <Button type="button"
+              label="Back"
+              icon="pi pi-arrow-left"
+              style="margin-left: 10px"
+              @click="back" />
     </div>
 
     <h1>Leader Board</h1>
 
 
-    <SearchBar/>
+    <SearchBar
+      :is-loading="isLoading"
+    />
 
 
     <div class="card" >
@@ -137,10 +171,10 @@ const leaderList = ref([]);
         </Column>
       </DataTable>
 
-      <DataTable :value="leaderList" tableStyle="width: 50vw;"  size="large" v-if="!isLoading && leaderList.length > 0"  >
-        <Column field="nickname" header="Nickname"></Column>
+      <DataTable :value="sordedLeaderList(speedRange , correctionRange , scoreRange)" tableStyle="width: 50vw;"  size="large" v-if="!isLoading && leaderList.length > 0"  >
+        <Column field="nickName" header="Nickname"></Column>
         <Column field="speed" :sortable="true"  header="Speed"></Column>
-        <Column field="correct_rate" :sortable="true" header="Correction"></Column>
+        <Column field="correctRate" :sortable="true" header="Correction"></Column>
         <Column field="score" :sortable="true" header="Score"></Column>
       </DataTable>
 
@@ -179,7 +213,7 @@ const leaderList = ref([]);
 
   border-radius: 10px;
 
-  min-height: 300px;
+  min-height: 360px;
 
   padding: 40px;
 }

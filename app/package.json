@@ -1,5 +1,5 @@
 {
-  "name": "app",
+  "name": "key-battler",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -9,14 +9,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "bootstrap": "^5.3.2",
-    "bootstrap-vue": "^2.23.1",
     "electorn": "^0.0.1-security",
-    "mobx-vue-lite": "^0.4.1",
     "primeicons": "^6.0.1",
     "primevue": "^3.46.0",
+    "vite-plugin-singlefile": "^0.13.5",
     "vue": "^3.4.5",
-    "vue-cli-plugin-electron-builder": "^2.1.1",
+    "vue-cli-plugin-electron-builder": "^1.4.6",
     "vue-router": "^4.2.5",
     "vue-timer-hook": "^1.0.84"
   },

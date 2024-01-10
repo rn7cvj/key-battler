@@ -5,10 +5,15 @@ import TypingTest from "./pages/typing-test/TypingTest.vue";
 import LoginPage from "./pages/login/LoginPage.vue";
 import SignUp from "./pages/sign-up/SignUp.vue";
 
+let baseUrl : string = import.meta.env.VITE_BASE_URL ?? "/web/";
+console.log(`VITE_BASE_URL: ${baseUrl}`);
+
 export default createRouter({
 
     // history: import.meta.env.IS_ELECTRON ? createWebHashHistory() : createWebHistory(),
-    history: createWebHistory(),
+
+    history: createWebHistory(baseUrl),
+
     routes: [
 
         {
