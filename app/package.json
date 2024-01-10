@@ -14,11 +14,12 @@
     "primevue": "^3.46.0",
     "vite-plugin-singlefile": "^0.13.5",
     "vue": "^3.4.5",
-    "vue-cli-plugin-electron-builder": "^1.4.6",
+    "vue-cli-plugin-electron-builder": "^2.1.1",
     "vue-router": "^4.2.5",
     "vue-timer-hook": "^1.0.84"
   },
   "devDependencies": {
+    "@electron/packager": "^18.1.3",
     "@vitejs/plugin-vue": "^4.5.2",
     "electron": "^28.1.2",
     "electron-builder": "^24.9.1",
