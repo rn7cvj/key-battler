@@ -1,57 +1,214 @@
-<script  lang="ts">
+<script setup lang="ts">
 
-import {defineComponent} from "vue";
-import Timer from "./components/Timer.vue";
+import {Ref, ref, onMounted} from "vue";
+import { useStopwatch } from 'vue-timer-hook';
+import {useToast} from "primevue/usetoast";
+
+import Knob from "primevue/knob";
+import Card from "primevue/card";
+import Toast from "primevue/toast";
+import Rating from "primevue/rating";
+import Skeleton from "primevue/skeleton";
+import ProgressBar from "primevue/progressbar";
+import isLetter from "./scripts/isLetter.ts";
 
 
-export default defineComponent(
-    {
-      components: {Timer},
+const stopwatch = useStopwatch( 0 , false);
 
-      data(){
-        window.addEventListener('keydown' , (ev : KeyboardEvent ) => {
-          this.letterType(ev.key)
-        });
-        return {
-          typedText : "",
-          untypedText  : "Путешествия - это один из самых увлекательных видов отдыха. Они позволяют увидеть новые места, познакомиться с разными культурами и традициями, а также отдохнуть от повседневной суеты и стресса. Путешествия помогают расширить кругозор и получить новые впечатления.",
-        }
-      },
 
-      methods:{
-        letterType(  key : string ){
-          if (key != this.untypedText.charAt(0)){
-            return;
-          }
-          this.typedText += this.untypedText.charAt(0);
-          this.untypedText = this.untypedText.substring(1 );
-        }
-      }
+const toast = useToast();
+
+const typedText: Ref<String> = ref("")
+const untypedText: Ref<String> = ref("")
+const isLoading: Ref<Boolean> = ref(true);
+
+const typingProgressValue: Ref<number> = ref(0);
+const correctionValue: Ref<number> = ref(0);
+const speedValue: Ref<number> = ref(0);
+
+let totalTypedKeys : number = 0;
+let correctTypedKeys : number = 0;
+
+// let textId: number = -1;
+
+const letterTyped = (key: string) => {
+
+  if (isLoading.value || !isLetter(key)) return;
+
+  if (!stopwatch.isRunning.value) stopwatch.start()
+
+  totalTypedKeys += 1;
+
+  if (key != untypedText.value.charAt(0)) {
+
+    correctionValue.value = Math.round( (correctTypedKeys / totalTypedKeys) * 100)
+
+    let totalSecond : number = stopwatch.minutes.value * 60 + stopwatch.seconds.value + 1;
+
+    let keyPerSecond : number = correctTypedKeys / totalSecond;
+
+    speedValue.value = Math.round(keyPerSecond * 60);
+
+    return;
+  }
+
+  correctTypedKeys += 1;
+
+
+  typedText.value += untypedText.value.charAt(0)
+  untypedText.value = untypedText.value.substring(1)
+
+  correctionValue.value = Math.round( (correctTypedKeys / totalTypedKeys) * 100)
+
+  let totalSecond : number = stopwatch.minutes.value * 60 + stopwatch.seconds.value + 1;
+
+  let keyPerSecond : number = correctTypedKeys / totalSecond;
+
+  speedValue.value = Math.round(keyPerSecond * 60);
+
+}
+
+const props = defineProps({
+  // text : { type : String , required : true } ,
+  textRating: {type: Number, required: true}
+})
+
+
+onMounted(async () => {
+
+  await fetchText();
+
+  window.addEventListener('keydown', (ev: KeyboardEvent) => letterTyped(ev.key));
+
+
+})
+
+
+const fetchText = async () => {
+
+  const url = `https://keybattler.poslam.ru/api/v1/text/generate/tier=${props.textRating}`
+  const token = localStorage.getItem('token') ?? ""
+
+  let response: Response | null = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'auth': token
     }
-)
+  }).catch(
+      (error) => {
+
+        console.log(error);
+
+        toast.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Server is temporarily unavailable',
+          group: 'bl',
+          life: 1500
+        });
+
+        return null;
+
+      });
+
+
+  if (response == null) return;
+
+  if (!response.ok) {
+    toast.add({
+      severity: 'warn',
+      summary: '',
+      detail: 'Can`t load new text',
+      group: 'bl',
+      life: 3000
+    })
+
+    untypedText.value = "Разнообразный и богатый опыт постоянный количественный рост и сфера нашей активности влечет за собой процесс внедрения и модернизации системы обучения кадров, соответствует насущным потребностям. Задача организации, в особенности же начало повседневной работы по формированию позиции представляет собой интересный эксперимент проверки существенных финансовых и административных условий.";
+
+    isLoading.value = false;
+
+    return;
+  }
+
+  let result = await response.json();
+
+  // textId = result["id"]
+  untypedText.value = result["text"]
+
+  isLoading.value = false;
+}
 
 
 </script>
 
 <template>
-    <div>
-      <h1 class="p-5">Typing test</h1>
 
-      <Timer/>
+  <Toast position="bottom-left" group="bl"/>
 
-      <h4>
-        <span class="text-primary">
-          {{typedText}}
-        </span>
-        <span class="text-muted">
-          {{untypedText}}
-        </span>
+  <div class="main-container">
+    <h1>Typing test</h1>
 
-      </h4>
+    <div style="display : flex; flex-direction: row; align-items: center; padding-bottom: 40px">
+      <h2 style="margin-right: 20px">Text rating:</h2>
+      <Rating :model-value="props.textRating" readonly :cancel="false"/>
+    </div>
+
+    <span style="width: 90%" v-if="isLoading">
+
+      <p> Text typing progress</p>
+      <ProgressBar :value="typingProgressValue"
+                   style="height: 20px; width: 100%; margin-bottom:40px"> {{}}</ProgressBar>
+
+    </span>
+
+    <Skeleton width="90%" height="200px" v-if="isLoading"/>
+
+
+    <Card style="min-height: 200px; width: 90%;  text-align: center" v-if="!isLoading">
+
+      <template #title> You`r text</template>
+      <template #subtitle> Press any key to start</template>
+      <template #content>
+        <h2>
+          <span class="typed-text">
+            {{ typedText }}
+          </span>
+          <span class="untyped-text">
+            {{ untypedText }}
+          </span>
+
+        </h2>
+      </template>
+
+    </Card>
+
+    <div style="display: flex; flex-direction: row; justify-content: space-evenly; width: 50%; padding-top: 40px;">
+
+      <div style="text-align: center">
+        <Knob v-model="correctionValue"  readonly/>
+        <p>Correction</p>
+      </div>
+
+      <div style="text-align: center">
+        <Knob v-model="speedValue" :min="0" :max="400" readonly/>
+        <p>Speed</p>
+      </div>
 
     </div>
+
+  </div>
 </template>
 
 <style scoped>
+
+.typed-text {
+  color: var(--primary-color)
+}
+
+.untyped-text {
+
+}
 
 </style>

@@ -32,13 +32,23 @@ const openLeaderBoard = () => {
   router.push("/leader-board");
 }
 
+const textRating : Ref<number> = ref(1);
+
 const typingTestSetupOp = ref();
-const opneTypeingTestSetup = (event :Event)  => {
+const openTypingTestSetup = (event :Event)  => {
   typingTestSetupOp.value.toggle(event);
 }
 
+const startTypingTest = () => {
+  console.log(`Start typing test with textRating: ${textRating.value}`)
 
-const textRating : Ref<number> = ref(1);
+  localStorage.setItem("textRating" , textRating.value.toString())
+  localStorage.setItem("text" , "text" +  textRating.value.toString())
+
+  router.push(`/typing-test?textRating=${textRating.value.toString()}`)
+
+}
+
 
 </script>
 
@@ -53,7 +63,7 @@ const textRating : Ref<number> = ref(1);
       <Button type="button"
               label="Start typing test"
               style="width : 550px; margin-bottom : 25px;"
-              @click="opneTypeingTestSetup"/>
+              @click="openTypingTestSetup"/>
 
     <OverlayPanel ref="typingTestSetupOp">
       <div style="width: 510px; display: flex; flex-direction: row; align-items: center; justify-content: space-between">
@@ -62,8 +72,9 @@ const textRating : Ref<number> = ref(1);
           <Rating v-model="textRating" :cancel="false" />
         </div>
         <Button
-        type="button"
-        label="Start"
+          type="button"
+          label="Start"
+          @click="startTypingTest"
         />
 
       </div>

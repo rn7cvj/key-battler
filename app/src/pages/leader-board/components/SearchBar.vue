@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import {Ref , ref} from "vue";
+import {Ref  , ref} from "vue";
 
 import InputText from "primevue/inputtext";
 import Button from "primevue/button";
@@ -11,14 +11,15 @@ let nickName : Ref<string> = ref("")
 
 
 const speedRangeOp = ref();
-const speedRangeMinMax : number[] = [0 , 300];
+const speedRangeMinMax : number[] = [0 , 400];
 const speedRange : Ref<number[]> = ref(speedRangeMinMax);
 const  openSpeedRangeDialog = (event : Event) => {
   speedRangeOp.value.toggle(event);
 }
 
 const correctionRangeOp = ref();
-
+const correctionRangeMinMax : number[] = [0 , 100]
+const correctionRange : Ref<number[]> = ref(correctionRangeMinMax)
 
 const  openCorrectionRangeDialog = (event:  Event) => {
   correctionRangeOp.value.toggle(event);
@@ -32,10 +33,17 @@ const  openScoreRangeDialog = (event:  Event) => {
   scoreRangeOp.value.toggle(event);
 }
 
-const props = defineProps({
-  isLoading : Boolean ,
 
-})
+interface ISearchBarProps {
+  isLoading : boolean,
+}
+
+
+const props = defineProps<ISearchBarProps>()
+
+const emits = defineEmits<{
+  (e : 'search' , nickName : string , speedRange : Array<number> , correctionRange: Array<number> , scoreRange : Array<number> ) : void
+}>()
 
 
 </script>
@@ -46,7 +54,7 @@ const props = defineProps({
 
     <span class="p-input-icon-left p-float-label"  style="width: 400px; margin: 20px">
       <i class="pi pi-search" />
-      <InputText :v-model="nickName" id="nickname" style="width: 100% "  :disabled="props.isLoading"/>
+      <InputText v-model="nickName" id="nickname" style="width: 100% "  :disabled="props.isLoading"/>
       <label for="nickname">Nickname</label>
     </span>
 
@@ -107,6 +115,13 @@ const props = defineProps({
       </div>
     </OverlayPanel>
 
+    <Button icon="pi pi-search"
+            severity="info"
+            style="margin: 20px"
+            :disabled="props.isLoading"
+            @click="emits('search' , nickName , speedRange , correctionRange , scoreRange)"
+    />
+
   </div>
 
 
@@ -124,7 +139,7 @@ const props = defineProps({
 
   flex-direction: row;
 
-  justify-content: space-evenly;
+  justify-content: center;
   align-items: center;
 
 

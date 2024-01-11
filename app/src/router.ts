@@ -30,7 +30,10 @@ export default createRouter({
         },
         {
             path: '/typing-test',
-            component: TypingTest
+            component: TypingTest,
+            props: route => ( {
+                textRating : route.query.textRating
+            })
         },
         {
             path: '/leader-board',
