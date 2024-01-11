@@ -20,6 +20,8 @@ jobs:
       - name: 📦 Install dependencies
         uses: bahmutov/npm-install@v1
 
+      - run: cd /app
+      
       - name: 🔨 Build project
         run: npm run build --base=/web-app/
  
@@ -30,4 +32,4 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           remote: /home/poslam/key-battler/web/
-          local: app/dist
+          local: /dist
