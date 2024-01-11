@@ -18,9 +18,7 @@ jobs:
         uses: actions/setup-node@v3
 
       - name: 📦 Install dependencies
-        uses: bahmutov/npm-install@v1
-
-      - run: cd /app
+        uses: cd /app && bahmutov/npm-install@v1
       
       - name: 🔨 Build project
         run: npm run build --base=/web-app/
