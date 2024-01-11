@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import {Ref, ref, onMounted} from "vue";
+import {Ref, ref, onMounted, watch} from "vue";
 import { useStopwatch } from 'vue-timer-hook';
 import {useToast} from "primevue/usetoast";
 
@@ -10,11 +10,21 @@ import Toast from "primevue/toast";
 import Rating from "primevue/rating";
 import Skeleton from "primevue/skeleton";
 import ProgressBar from "primevue/progressbar";
-import isLetter from "./scripts/isLetter.ts";
+import  {isLetter, isPunctuation} from "./scripts/isLetter.ts";
 
 
 const stopwatch = useStopwatch( 0 , false);
 
+watch(
+    stopwatch.seconds ,
+    (second : number) =>{
+      let totalSecond : number = stopwatch.minutes.value * 60 + second+ 1;
+
+      let keyPerSecond : number = correctTypedKeys / totalSecond;
+
+      speedValue.value = Math.round(keyPerSecond * 60);
+    }
+)
 
 const toast = useToast();
 
@@ -33,7 +43,7 @@ let correctTypedKeys : number = 0;
 
 const letterTyped = (key: string) => {
 
-  if (isLoading.value || !isLetter(key)) return;
+  if (isLoading.value || ( !isLetter(key) && !isPunctuation(key))) return;
 
   if (!stopwatch.isRunning.value) stopwatch.start()
 
@@ -57,6 +67,8 @@ const letterTyped = (key: string) => {
 
   typedText.value += untypedText.value.charAt(0)
   untypedText.value = untypedText.value.substring(1)
+
+  typingProgressValue.value =  ( correctTypedKeys / (typedText.value.length + untypedText.value.length)) * 100
 
   correctionValue.value = Math.round( (correctTypedKeys / totalTypedKeys) * 100)
 
@@ -155,23 +167,23 @@ const fetchText = async () => {
       <Rating :model-value="props.textRating" readonly :cancel="false"/>
     </div>
 
-    <span style="width: 90%" v-if="isLoading">
+    <span style="width: 90%" v-if="!isLoading">
 
       <p> Text typing progress</p>
       <ProgressBar :value="typingProgressValue"
-                   style="height: 20px; width: 100%; margin-bottom:40px"> {{}}</ProgressBar>
+                   style="height: 10px; width: 100%; margin-bottom:40px"> {{}}</ProgressBar>
 
     </span>
 
     <Skeleton width="90%" height="200px" v-if="isLoading"/>
 
 
-    <Card style="min-height: 200px; width: 90%;  text-align: center" v-if="!isLoading">
+    <Card style=" width: 90%;  text-align: center;" v-if="!isLoading">
 
       <template #title> You`r text</template>
       <template #subtitle> Press any key to start</template>
       <template #content>
-        <h2>
+        <h2 style="margin-bottom: 40px">
           <span class="typed-text">
             {{ typedText }}
           </span>

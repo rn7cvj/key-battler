@@ -1,0 +1,34 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🚚 Get latest code
+        uses: actions/checkout@v3
+
+      - name: 🔧 Setup Node
+        uses: actions/setup-node@v3
+
+      - name: 📦 Install dependencies
+        uses: bahmutov/npm-install@v1
+
+      - name: 🔨 Build project
+        run: npm run build --base=/web-app/
+
+      
+      - name: 📂 Sync files
+          uses: garygrossgarten/github-action-scp@release
+          with:
+            host: ${{ secrets.FTP_HOST }}
+            username: ${{ secrets.FTP_USERNAME }}
+            password: ${{ secrets.FTP_PASSWORD }}
+            remote: /home/poslam/key-battler/web/
+            local: app/dist
