@@ -22,8 +22,7 @@ jobs:
 
       - name: 🔨 Build project
         run: npm run build --base=/web-app/
-
-      
+ 
       - name: 📂 Sync files
           uses: garygrossgarten/github-action-scp@release
           with:
