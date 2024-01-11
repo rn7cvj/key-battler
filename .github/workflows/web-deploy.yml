@@ -24,10 +24,10 @@ jobs:
         run: npm run build --base=/web-app/
  
       - name: 📂 Sync files
-          uses: garygrossgarten/github-action-scp@release
-          with:
-            host: ${{ secrets.FTP_HOST }}
-            username: ${{ secrets.FTP_USERNAME }}
-            password: ${{ secrets.FTP_PASSWORD }}
-            remote: /home/poslam/key-battler/web/
-            local: app/dist
+        uses: garygrossgarten/github-action-scp@release
+        with:
+          host: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          remote: /home/poslam/key-battler/web/
+          local: app/dist
