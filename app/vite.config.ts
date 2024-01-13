@@ -10,13 +10,13 @@ export default defineConfig({
       vue(),
       viteSingleFile(),
     ],
-    // server: {
-  //   proxy: {
-  //     '/api': {
-  //       target: 'https://keybattler.poslam.ru', // Replace with your backend API URL
-  //       changeOrigin: true
-  //     }
-  //   }
-  // }
+    server: {
+    proxy: {
+      '/api': {
+        target: 'https://keybattler.poslam.ru', // Replace with your backend API URL
+        changeOrigin: true
+      }
+    }
+  }
 
 })

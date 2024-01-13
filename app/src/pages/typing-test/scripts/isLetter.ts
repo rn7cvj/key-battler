@@ -4,5 +4,5 @@ export function isLetter(value : string) : Boolean {
 }
 
 export function  isPunctuation(value : string) : Boolean {
-    return  value.length === 1 && ( value === ' ' ||  value === '.' || value === ',')
+    return  value.length === 1 && ( value === ' ' ||  value === '.' || value === ',' || value === '-' || value === '!' || value === ':')
 }
