@@ -1,2 +1,0 @@
-
-let token : string = ""

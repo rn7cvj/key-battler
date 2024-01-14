@@ -21,4 +21,6 @@ app.use(PrimeVue)
 app.use(ToastService)
 app.use(ConfirmationService);
 
+app.config.performance = true;
+
 app.mount('#app')

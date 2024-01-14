@@ -1,4 +1,4 @@
-import {createRouter, createWebHistory} from 'vue-router';
+import {createRouter, createWebHashHistory} from 'vue-router';
 import HomePage from "./pages/home/HomePage.vue";
 import LeaderBoard from "./pages/leader-board/LeaderBoard.vue";
 import TypingTest from "./pages/typing-test/TypingTest.vue";
@@ -12,10 +12,9 @@ export default createRouter({
 
     // history: import.meta.env.IS_ELECTRON ? createWebHashHistory() : createWebHistory(),
 
-    history: createWebHistory(baseUrl),
+    history: createWebHashHistory(),
 
     routes: [
-
         {
             path: '/home',
             component: HomePage,
