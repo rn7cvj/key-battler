@@ -102,17 +102,19 @@ const props = defineProps({
 
 onMounted(async () => {
 
-  // await fetchText();
-  fetchMockText();
+
+
+  await fetchText();
+  // fetchMockText();
   window.addEventListener('keydown', (ev: KeyboardEvent) => letterTyped(ev.key));
 
 
 })
 
-const fetchMockText = () => {
-  isLoading.value = false;
-  untypedText.value = 'qwerty';
-}
+// const fetchMockText = () => {
+//   isLoading.value = false;
+//   untypedText.value = 'qwerty';
+// }
 
 const fetchText = async () => {
 
@@ -171,12 +173,12 @@ const fetchText = async () => {
 }
 
 const onTypingTestEnd = () => {
+
   stopwatch.pause();
   isTypingTestStart.value = false;
   isTypingTestEnd.value = true;
 
   console.log(`Typing test end with result\n\tSpeed: ${speedValue.value}\n\tCorrection: ${correctionValue.value}\n\tTextId: ${textId}`)
-
 
 }
 
@@ -209,7 +211,7 @@ const back = () => {
 
   <div class="main-container">
 
-    <div v-if="!isTypingTestEnd">
+    <div v-if="!isTypingTestEnd" style="width: 100%; display: flex; flex-direction: column; align-items : center; justify-content: center; ">
 
       <span style="width: 90%" v-if="!isLoading">
 
@@ -220,7 +222,6 @@ const back = () => {
     </span>
 
       <Skeleton width="90%" height="200px" v-if="isLoading"/>
-
 
       <Card style=" width: 90%;  text-align: center;" v-if="!isLoading">
 
