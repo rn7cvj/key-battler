@@ -69,7 +69,7 @@ const startTypingTest = () => {
       <div style="width: 510px; display: flex; flex-direction: row; align-items: center; justify-content: space-between">
         <div style="display: flex; flex-direction: row;">
           <div style="margin-right: 20px">Select text raiting: </div>
-          <Rating v-model="textRating" :cancel="false" />
+          <Rating v-model="textRating" :stars="3" :cancel="false" />
         </div>
         <Button
           type="button"

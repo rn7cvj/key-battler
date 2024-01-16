@@ -126,6 +126,7 @@ const searchLeaderList = (nickName : string , speedRanger : number[] , correctio
 
   leaderList.value = sortLeaderList(nickName , speedRanger , correctionRange , scoreRange)
 
+
   if (leaderList.value.length == 0) {
     toast.add(
         {
@@ -148,15 +149,24 @@ isLoading.value = false ;
 
   <Toast  position="bottom-left" group="bl" />
 
-  <div class="main-container leader-board-container">
 
-    <div style="width: 100%; height : 80px; align-items: center; display: flex; ">
-      <Button type="button"
-              label="Back"
-              icon="pi pi-arrow-left"
-              style="margin-left: 10px"
-              @click="back" />
-    </div>
+  <div style="width: 100%; height : 80px; align-items: center; display: flex; justify-content: space-between ">
+    <Button type="button"
+            label="Back"
+            icon="pi pi-arrow-left"
+            style="margin-left: 10px"
+            @click="back" />
+
+    <Button type="button"
+            style="margin-right: 10px"
+            label="Refresh"
+            :icon = "isLoading ? 'pi pi-spinner pi-spin' : 'pi pi-refresh' "
+            :disabled=isLoading
+            @click="fetchLeaderBoard"/>
+  </div>
+
+
+  <div class="main-container leader-board-container">
 
     <h1>Leader Board</h1>
 
@@ -202,12 +212,7 @@ isLoading.value = false ;
 
     </div>
 
-      <Button type="button"
-              style="margin-top: 40px "
-              label="Refresh"
-              :icon = "isLoading ? 'pi pi-spinner pi-spin' : 'pi pi-refresh' "
-              :disabled=isLoading
-              @click="fetchLeaderBoard"/>
+
 
   </div>
 
@@ -234,7 +239,6 @@ isLoading.value = false ;
 
   border-radius: 10px;
 
-  min-height: 360px;
 
   padding: 40px;
 }

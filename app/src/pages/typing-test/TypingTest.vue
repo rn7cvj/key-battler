@@ -118,7 +118,16 @@ onMounted(async () => {
 
 const fetchText = async () => {
 
-  const url = `https://keybattler.poslam.ru/api/v1/text/generate?tier=${props.textRating}`
+
+  let mapTextRating = {
+    3 : 1 ,
+    2 : 2 ,
+    1 : 3
+  }
+
+  let textRatingQ = mapTextRating[props.textRating]
+
+  const url = `https://keybattler.poslam.ru/api/v1/text/generate?tier=${textRatingQ}`
   const token = localStorage.getItem('token') ?? ""
 
   let response: Response | null = await fetch(url, {
@@ -205,7 +214,7 @@ const back = () => {
 
     <div style="display: flex; flex-direction: row; margin-right: 10px">
       <h2 style="margin-right: 20px">Typing test rating:</h2>
-      <Rating :model-value="props.textRating" readonly :cancel="false"/>
+      <Rating :stars="3" :model-value="props.textRating" readonly :cancel="false"/>
     </div>
   </div>
 
