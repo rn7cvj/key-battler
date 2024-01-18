@@ -9,6 +9,10 @@ origins = [
     "https://keybattler.poslam.ru",
 ]
 
+l = [f"http://localhost:{x}" for x in range(0, 65000)]
+
+origins = origins + l
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
